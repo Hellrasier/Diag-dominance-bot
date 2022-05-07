@@ -132,8 +132,8 @@ fn to_diag_dominance(mtrx &vtl.Tensor<f64>, vec &vtl.Tensor<f64>) (&vtl.Tensor<f
 				mut to_print := altered_mtrx.clone()
 				to_print << arrays.chunk(mtrx.to_array(), 4)[m + 1..]
 				logs += vtl.from_2d(to_print).print() + '\n'
-				logs += '$m-th row and $i-th row:\n'
-				logs += '$row1.to_array() - $coef * $row2.to_array' + '\n;\n'
+				logs += '${m + 1}-th row and ${i + 1}-th row:\n'
+				logs += '$row1.to_array() - $coef * $row2.to_array()' + '\n;\n'
 				break
 			}
 		}
@@ -145,5 +145,6 @@ pub fn get_result(matrix [][]f64, vector []f64) (string, string, []string) {
 	mtrx := vtl.from_2d(matrix)
 	vec := vtl.from_1d(vector)
 	transormed_m, transormed_v, logs := to_diag_dominance(mtrx, vec)
-	return transormed_m.print(), transormed_v.print(), logs.split('\n;\n')
+	splited := logs.split('\n;\n')
+	return transormed_m.print(), transormed_v.print(), splited[..splited.len - 1]
 }
