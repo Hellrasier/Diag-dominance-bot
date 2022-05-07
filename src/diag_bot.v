@@ -36,7 +36,7 @@ fn parse_input(input string) ?([][]f64, []f64) {
 	return parsed_mtrx, parsed_vec
 }
 
-fn handle_update(update vgram.Update) ?string {
+fn handle_update(update vgram.Update, bot vgram.Bot) ?string {
 	match update.message.text {
 		'/start' {
 			return start_message
@@ -46,7 +46,7 @@ fn handle_update(update vgram.Update) ?string {
 		}
 		else {
 			matrix, vector := parse_input(update.message.text) or { return error_message }
-			matrix_string, vec_string := diag_matrix.get_result(matrix, vector)
+			matrix_string, vec_string, logs := diag_matrix.get_result(matrix, vector)
 			return result_message + '$matrix_string\n$vec_string'
 		}
 	}
@@ -56,6 +56,7 @@ fn main() {
 	token := os.getenv('BOT_TOKEN')
 	bot := vgram.new_bot(token)
 	mut updates := []vgram.Update{}
+	updates_chan := chan vgram.Update{}
 	mut last_offset := 0
 	for {
 		updates = bot.get_updates(offset: last_offset, limit: 100)
@@ -63,7 +64,7 @@ fn main() {
 			if last_offset < update.update_id {
 				last_offset = update.update_id
 				println('Got update from @$update.message.from.username with text:\n$update.message.text')
-				message := handle_update(update) or { unexpected_error }
+				message := handle_update(update, bot) or { unexpected_error }
 				bot.send_message(
 					chat_id: update.message.from.id.str()
 					text: message

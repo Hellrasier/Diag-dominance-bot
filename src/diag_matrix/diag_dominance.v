@@ -113,9 +113,10 @@ fn solve_module_inequation(row1 []f64, row2 []f64, i_first int) f64 {
 	return 0.0
 }
 
-fn to_diag_dominance(mtrx &vtl.Tensor<f64>, vec &vtl.Tensor<f64>) (&vtl.Tensor<f64>, &vtl.Tensor<f64>) {
+fn to_diag_dominance(mtrx &vtl.Tensor<f64>, vec &vtl.Tensor<f64>) (&vtl.Tensor<f64>, &vtl.Tensor<f64>, string) {
 	mut altered_mtrx := [][]f64{}
 	mut altered_vec := []f64{}
+	mut logs := ''
 	for m in 0 .. mtrx.shape[0] {
 		for i in 0 .. mtrx.shape[0] {
 			if i == m {
@@ -130,16 +131,19 @@ fn to_diag_dominance(mtrx &vtl.Tensor<f64>, vec &vtl.Tensor<f64>) (&vtl.Tensor<f
 
 				mut to_print := altered_mtrx.clone()
 				to_print << arrays.chunk(mtrx.to_array(), 4)[m + 1..]
+				logs += vtl.from_2d(to_print).print() + '\n'
+				logs += '$m-th row and $i-th row:\n'
+				logs += '$row1.to_array() - $coef * $row2.to_array' + '\n;\n'
 				break
 			}
 		}
 	}
-	return vtl.from_2d(altered_mtrx), vtl.from_1d(altered_vec)
+	return vtl.from_2d(altered_mtrx), vtl.from_1d(altered_vec), logs
 }
 
-pub fn get_result(matrix [][]f64, vector []f64) (string, string) {
+pub fn get_result(matrix [][]f64, vector []f64) (string, string, []string) {
 	mtrx := vtl.from_2d(matrix)
 	vec := vtl.from_1d(vector)
-	transormed_m, transormed_v := to_diag_dominance(mtrx, vec)
-	return transormed_m.print(), transormed_v.print()
+	transormed_m, transormed_v, logs := to_diag_dominance(mtrx, vec)
+	return transormed_m.print(), transormed_v.print(), logs.split('\n;\n')
 }
