@@ -8,7 +8,7 @@ on:
     
 jobs:
   deploy:
-    runs-on: [ self-hosted, linux, x64, ohranka-petrovsk-server ]
+    runs-on: [ self-hosted, linux, x64, ubuntu-latest ]
     defaults:
       run:
         working-directory: Diag-matrix-bot
@@ -19,7 +19,7 @@ jobs:
           path: ./Diag-matrix-bot
       - name: "Copying env files"
         run: |
-          echo "BOT_TOKEN=${{ secretsDIAG_MATRIX_BOT_TOKEN }}" > ./.env
+          echo "BOT_TOKEN=${{ secrets.DIAG_MATRIX_BOT_TOKEN }}" > ./.env
       - name: "Building image..."
         run: docker-compose build
       - name: "Starting service..."

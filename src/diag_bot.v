@@ -59,7 +59,13 @@ fn handle_update(update vgram.Update, bot vgram.Bot) {
 				)
 				return
 			}
-			matrix_string, vec_string, logs := diag_matrix.get_result(matrix, vector)
+			matrix_string, vec_string, logs := diag_matrix.get_result(matrix, vector) or {
+				bot.send_message(
+					chat_id: update.message.from.id.str()
+					text: err.msg()
+				)
+				return
+			}
 			bot.send_message(
 				chat_id: update.message.from.id.str()
 				text: 'Data recieved, output:'

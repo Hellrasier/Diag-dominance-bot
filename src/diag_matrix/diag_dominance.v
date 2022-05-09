@@ -113,9 +113,12 @@ fn solve_module_inequation(row1 []f64, row2 []f64, i_first int) f64 {
 	return 0.0
 }
 
-fn to_diag_dominance(mtrx &vtl.Tensor<f64>, vec &vtl.Tensor<f64>) (&vtl.Tensor<f64>, &vtl.Tensor<f64>, string) {
+fn to_diag_dominance(mtrx &vtl.Tensor<f64>, vec &vtl.Tensor<f64>) ?(&vtl.Tensor<f64>, &vtl.Tensor<f64>, string) {
 	mut altered_mtrx := [][]f64{}
 	mut altered_vec := []f64{}
+	if mtrx.shape[0] != mtrx.shape[1] && vec.shape[0] != mtrx.shape[0] {
+		return error('Error, matrix is not symmetric, or dimenstion of vector and matrix are not equal')
+	}
 	mut logs := ''
 	for m in 0 .. mtrx.shape[0] {
 		for i in 0 .. mtrx.shape[0] {
@@ -130,7 +133,7 @@ fn to_diag_dominance(mtrx &vtl.Tensor<f64>, vec &vtl.Tensor<f64>) (&vtl.Tensor<f
 				altered_vec << vec.get([m, 0]) - coef * vec.get([i, 0])
 
 				mut to_print := altered_mtrx.clone()
-				to_print << arrays.chunk(mtrx.to_array(), 4)[m + 1..]
+				to_print << arrays.chunk(mtrx.to_array(), mtrx.shape[0])[m + 1..]
 				logs += vtl.from_2d(to_print).print() + '\n'
 				logs += '${m + 1}-th row and ${i + 1}-th row:\n'
 				logs += '$row1.to_array() - $coef * $row2.to_array()' + '\n;\n'
@@ -138,13 +141,16 @@ fn to_diag_dominance(mtrx &vtl.Tensor<f64>, vec &vtl.Tensor<f64>) (&vtl.Tensor<f
 			}
 		}
 	}
+	if altered_mtrx.len == 0 {
+		return error('This matrix could not be turnet into diagonal dominant form')
+	}
 	return vtl.from_2d(altered_mtrx), vtl.from_1d(altered_vec), logs
 }
 
-pub fn get_result(matrix [][]f64, vector []f64) (string, string, []string) {
+pub fn get_result(matrix [][]f64, vector []f64) ?(string, string, []string) {
 	mtrx := vtl.from_2d(matrix)
 	vec := vtl.from_1d(vector)
-	transormed_m, transormed_v, logs := to_diag_dominance(mtrx, vec)
+	transormed_m, transormed_v, logs := to_diag_dominance(mtrx, vec) or { return err }
 	splited := logs.split('\n;\n')
 	return transormed_m.print(), transormed_v.print(), splited[..splited.len - 1]
 }
