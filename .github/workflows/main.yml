@@ -8,7 +8,7 @@ on:
     
 jobs:
   deploy:
-    runs-on: [ self-hosted, linux, x64, ubuntu-latest ]
+    runs-on: [ x64, ubuntu-latest ]
     defaults:
       run:
         working-directory: Diag-matrix-bot
