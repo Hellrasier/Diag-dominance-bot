@@ -5,6 +5,7 @@ import dariotarantini.vgram
 import diag_matrix
 import json
 import time
+// lol
 
 const (
 	start_message = "Hello! I can turn your matrix to diag dominance :)\nPlease, input your matrix and vector using '[' ']', separating it with semicolon, for example:\n\n[[1.0, 0.42, 0.54, 0.66],
